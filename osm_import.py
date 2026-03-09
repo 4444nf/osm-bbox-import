@@ -17,7 +17,7 @@ def download_osm_gdf_bbox(minlat: float, minlon: float,
 
     api = overpy.Overpass()
 
-    # tag filter
+    
     if tag_key and tag_value:
         tag_filter = f'["{tag_key}"="{tag_value}"]'
     elif tag_key:
