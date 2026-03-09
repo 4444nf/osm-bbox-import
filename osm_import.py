@@ -5,6 +5,9 @@ from shapely.geometry import LineString, Point
 import matplotlib.pyplot as plt
 import datetime
 
+if __name__ == "__main__":
+    main()
+
 def download_osm_gdf_bbox(minlat: float, minlon: float,
                          maxlat: float, maxlon: float,
                          osm_type: str,
@@ -97,9 +100,6 @@ def main():
         ax.set_axis_off()
         plt.show()
 
-
-if __name__ == "__main__":
-    main()
 
 # Simple test function to run the downloader without CLI arguments
 def download_one():
