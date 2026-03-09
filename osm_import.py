@@ -3,7 +3,6 @@ import geopandas as gpd
 import overpy
 from shapely.geometry import LineString, Point
 import matplotlib.pyplot as plt
-import time
 import datetime
 
 def download_osm_gdf_bbox(minlat: float, minlon: float,
@@ -23,7 +22,6 @@ def download_osm_gdf_bbox(minlat: float, minlon: float,
     else:
         tag_filter = ""
 
-    # bbox query (area nélkül)
     query = f"""
     [out:json][timeout:{timeout}];
     way["highway"]({minlat},{minlon},{maxlat},{maxlon});
@@ -52,14 +50,13 @@ def download_osm_gdf_bbox(minlat: float, minlon: float,
                 **node.tags
             })
 
-    # üres eset
     if not records:
         return gpd.GeoDataFrame(columns=["geometry"], crs="EPSG:4326")
 
     return gpd.GeoDataFrame(records, crs="EPSG:4326")
 
 def main():
-    parser = argparse.ArgumentParser(description="OSM bbox adatlehívó")
+    parser = argparse.ArgumentParser(description="Download OSM data from a bounding box using Overpass API")
     parser.add_argument("--minlat", type=float, required=True)
     parser.add_argument("--minlon", type=float, required=True)
     parser.add_argument("--maxlat", type=float, required=True)
@@ -72,13 +69,12 @@ def main():
     parser.add_argument("--tag_value", type=str)
 
     parser.add_argument("--output", type=str,
-                        help="Kimeneti fájl (pl. roads.gpkg vagy roads.shp)")
+                        help="Output file (e.g., roads.gpkg or roads.shp)")
 
     parser.add_argument("--plot", action="store_true",
-                        help="Kirajzolja matplotlibtel")
+                        help="Plot the data using Matplotlib")
 
     args = parser.parse_args()
-    # argumentumok beolvasása
 
     gdf = download_osm_gdf_bbox(
         minlat=args.minlat,
@@ -90,11 +86,11 @@ def main():
         tag_value=args.tag_value
     )
 
-    print(f"Letöltött elemek száma: {len(gdf)}")
+    print(f"Number of downloaded elements: {len(gdf)}")
 
     if args.output:
         gdf.to_file(args.output)
-        print(f"Mentve: {args.output}")
+        print(f"Saved to: {args.output}")
 
     if args.plot and not gdf.empty:
         ax = gdf.plot(figsize=(10, 10))
@@ -105,6 +101,7 @@ def main():
 if __name__ == "__main__":
     main()
 
+# Simple test function to run the downloader without CLI arguments
 def download_one():
     ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     gdf = download_osm_gdf_bbox(
@@ -113,9 +110,8 @@ def download_one():
         maxlat=47.43,
         maxlon=19.40,
         osm_type="way"
-
     )
 
     filename = f"osm_data_{ts}.geojson"
     gdf.to_file(filename, driver="GeoJSON")
-    print(f"Mentve: {filename}")
+    print(f"Saved to: {filename}")
